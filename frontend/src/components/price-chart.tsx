@@ -62,14 +62,18 @@ export function PriceChart({
               return tooltipFmt(Number(v));
             }}
             labelFormatter={(label) => label}
-            contentStyle={{ borderRadius: 8 }}
+            contentStyle={{
+              borderRadius: 10,
+              border: "1px solid var(--border)",
+              boxShadow: "0 10px 28px -10px oklch(0.22 0.05 268 / 0.22)",
+            }}
           />
           <Legend />
           <Line
             type="monotone"
             dataKey="actual"
-            name="Kapanış (geçmiş)"
-            stroke="#2563eb"
+            name="Gerçek kapanış"
+            stroke="var(--chart-1)"
             dot={false}
             strokeWidth={2}
             connectNulls
@@ -77,8 +81,8 @@ export function PriceChart({
           <Line
             type="monotone"
             dataKey="fit"
-            name="Model (geçmiş)"
-            stroke="#7dd3fc"
+            name="Model · geçmiş uyumu"
+            stroke="var(--chart-2)"
             dot={false}
             strokeWidth={1.5}
             connectNulls
@@ -86,8 +90,8 @@ export function PriceChart({
           <Line
             type="monotone"
             dataKey="future"
-            name="Tahmin"
-            stroke="#ea580c"
+            name="İleriye tahmin"
+            stroke="var(--chart-3)"
             dot={false}
             strokeWidth={2}
             connectNulls
@@ -95,8 +99,8 @@ export function PriceChart({
           <Line
             type="monotone"
             dataKey="lower"
-            name="Alt güven"
-            stroke="#94a3b8"
+            name="Muhtemel alt band"
+            stroke="var(--chart-4)"
             dot={false}
             strokeWidth={1}
             strokeDasharray="4 4"
@@ -105,8 +109,8 @@ export function PriceChart({
           <Line
             type="monotone"
             dataKey="upper"
-            name="Üst güven"
-            stroke="#94a3b8"
+            name="Muhtemel üst band"
+            stroke="var(--chart-4)"
             dot={false}
             strokeWidth={1}
             strokeDasharray="4 4"
