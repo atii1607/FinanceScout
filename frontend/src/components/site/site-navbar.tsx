@@ -14,7 +14,7 @@ const NAV_GROUPS = [
     title: "Gezinme",
     icon: Compass,
     links: [
-      { href: "/", label: "Ana sayfa" },
+      { href: "/home", label: "Ana sayfa" },
       { href: "/hizmetler", label: "Hizmetler" },
       { href: "/guvenlik", label: "Güvenlik" },
       { href: "/analiz", label: "Analiz merkezi" },
@@ -136,11 +136,9 @@ export function SiteNavbar() {
                 </div>
                 <ul className="space-y-1">
                   {group.links.map((link) => {
-                    const active =
-                      link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
+                    const active = pathname === link.href || (link.href !== "/home" && pathname.startsWith(`${link.href}/`));
                     return (
-                      <li key={link.href}>
-                        <Link
+                      <li key={link.href}>                        <Link
                           href={link.href}
                           className={cn(
                             "flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-all",
