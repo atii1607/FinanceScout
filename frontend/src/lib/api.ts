@@ -82,6 +82,24 @@ async function parseErrorDetail(res: Response): Promise<string> {
   }
 }
 
+export type MarketItem = {
+  symbol: string;
+  name: string;
+  price: number;
+  change_pct: number;
+};
+
+export type MarketSummaryApiResponse = {
+  items: MarketItem[];
+};
+
+export async function fetchMarketSummary(): Promise<MarketItem[]> {
+  const res = await netFetch(`${BASE}/market-summary`);
+  if (!res.ok) throw new Error(await parseErrorDetail(res));
+  const j = (await res.json()) as MarketSummaryApiResponse;
+  return j.items ?? [];
+}
+
 export async function fetchSymbols(q?: string): Promise<string[]> {
   const url = new URL("/symbols/search", BASE);
   if (q?.trim()) url.searchParams.set("q", q.trim());

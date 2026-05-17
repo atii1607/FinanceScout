@@ -28,23 +28,23 @@ const FOOTER_COL = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-white/10 bg-[var(--footer-bg)] text-[var(--footer-fg)]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4 md:gap-8">
+    <footer className="mt-auto border-t border-border bg-muted/30 text-foreground">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-4 md:gap-12">
         <div className="md:col-span-1">
-          <p className="font-heading text-lg font-semibold tracking-tight">FinanceScout</p>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-[var(--footer-muted)]">
+          <p className="font-heading text-xl font-bold tracking-tight text-primary">FinanceScout</p>
+          <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-muted-foreground">
             Veriye dayalı özetler sunan dijital bir analiz deneyimi. Şeffaf süreçler ve güven odaklı iletişim ile yanınızdayız.
           </p>
         </div>
         {FOOTER_COL.map((col) => (
           <div key={col.title}>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--footer-fg)]">{col.title}</p>
-            <ul className="mt-4 flex flex-col gap-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">{col.title}</p>
+            <ul className="mt-5 flex flex-col gap-3">
               {col.links.map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-sm text-[var(--footer-muted)] transition-colors hover:text-[var(--footer-fg)]"
+                    className="text-[14px] font-medium text-muted-foreground transition-colors hover:text-primary"
                   >
                     {l.label}
                   </Link>
@@ -54,14 +54,18 @@ export function SiteFooter() {
           </div>
         ))}
       </div>
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-6xl px-4 py-6 text-center text-xs leading-relaxed text-[var(--footer-muted)] md:text-left">
-          <p>
-            FinanceScout bir öğrenme ve demo platformudur; burada sunulan tahmin ve metrikler{" "}
-            <strong className="font-medium text-[var(--footer-fg)]">yatırım tavsiyesi değildir</strong>. Gerçek yatırım
-            kararlarınız için yetkili kurumlara başvurun.
-          </p>
-          <p className="mt-3">© {new Date().getFullYear()} FinanceScout. Tüm hakları saklıdır.</p>
+      <div className="border-t border-border/60 bg-muted/20">
+        <div className="mx-auto max-w-6xl px-6 py-8 text-center text-[13px] leading-relaxed text-muted-foreground md:text-left">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <p>
+                FinanceScout bir öğrenme ve demo platformudur; burada sunulan tahmin ve metrikler{" "}
+                <strong className="font-semibold text-foreground">yatırım tavsiyesi değildir</strong>. 
+                Gerçek yatırım kararlarınız için yetkili kurumlara başvurun.
+              </p>
+            </div>
+            <p className="shrink-0 font-medium">© {new Date().getFullYear()} FinanceScout.</p>
+          </div>
         </div>
       </div>
     </footer>

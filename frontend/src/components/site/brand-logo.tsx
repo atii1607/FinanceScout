@@ -1,18 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <span
-      className={cn(
-        "bg-primary text-primary-foreground inline-flex size-10 shrink-0 items-center justify-center rounded-full text-xs font-bold tracking-tight shadow-md",
-        className,
-      )}
-      aria-hidden
-    >
-      FS
-    </span>
+    <div className={cn("relative overflow-hidden shrink-0", className)}>
+      <Image
+        src="/logo.png"
+        alt="FinanceScout Logo"
+        width={48}
+        height={48}
+        className="h-full w-full object-contain"
+        priority
+      />
+    </div>
   );
 }
 

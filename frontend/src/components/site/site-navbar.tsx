@@ -37,6 +37,7 @@ export function SiteNavbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -49,7 +50,13 @@ export function SiteNavbar() {
     }
     function onPointerDown(e: MouseEvent | TouchEvent) {
       const el = shellRef.current;
-      if (el && !el.contains(e.target as Node)) setMenuOpen(false);
+      const btn = buttonRef.current;
+      
+      // Eğer tıklanan yer sidebar (el) DEĞİLSE ve buton (btn) DEĞİLSE kapat.
+      // Butona tıklandığında butonun kendi onClick'i çalışmalı.
+      if (el && !el.contains(e.target as Node) && btn && !btn.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
     }
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onPointerDown);
@@ -62,100 +69,118 @@ export function SiteNavbar() {
   }, [menuOpen]);
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-[120] px-5 pt-4 md:px-8 md:pt-5">
-      <div className="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between gap-4">
-        {/* Sol: logo + kelime + dropdown */}
-        <div ref={shellRef} className="relative flex min-w-0 shrink-0 items-center">
+    <>
+      {/* Üst Bar - Logo ve Hızlı Aksiyon */}
+      <header className="fixed inset-x-0 top-0 z-[130] flex items-center justify-between px-6 py-4 md:px-8">
+        <div className="flex items-center gap-4">
           <button
+            ref={buttonRef}
             type="button"
-            className="border-[var(--nav-border)] bg-[var(--nav-surface)] hover:bg-[var(--nav-trigger-hover)] flex items-center gap-2 rounded-2xl border px-2 py-2 pr-3 shadow-[var(--nav-shadow)] backdrop-blur-xl transition-colors duration-300 ease-out"
+            className="group flex items-center gap-3 outline-none"
             aria-expanded={menuOpen}
-            aria-haspopup="dialog"
-            aria-controls="site-nav-command"
             onClick={() => setMenuOpen((v) => !v)}
           >
-            <LogoMark className="size-10 shrink-0 shadow-md sm:size-11" />
-            <span className="font-heading text-[var(--nav-fg)] hidden text-[15px] font-semibold tracking-tight sm:inline md:text-base">
-              FinanceScout
-            </span>
-            <ChevronDown
-              className={cn(
-                "text-[var(--nav-muted)] size-4 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                menuOpen ? "rotate-180" : "rotate-0",
+            <div className="relative">
+              <LogoMark className="size-11 rounded-xl shadow-lg transition-transform group-hover:scale-105 sm:size-12" />
+              {menuOpen && (
+                <div className="bg-primary absolute -right-1 -top-1 size-3 rounded-full border-2 border-white" />
               )}
-              aria-hidden
-            />
-          </button>
-
-          <div
-            id="site-nav-command"
-            role="dialog"
-            aria-label="Site menüsü"
-            aria-hidden={!menuOpen}
-            className={cn(
-              "border-[var(--panel-border)] bg-[var(--panel-bg)] absolute left-0 top-[calc(100%+12px)] z-[130] w-[min(calc(100vw-2rem),440px)] origin-top-left rounded-[24px] border p-5 shadow-[var(--panel-shadow)] backdrop-blur-xl motion-safe:transition-[opacity,transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] sm:w-[min(92vw,480px)] md:w-[520px]",
-              menuOpen
-                ? "pointer-events-auto translate-y-0 scale-100 opacity-100 blur-0"
-                : "pointer-events-none translate-y-2 scale-[0.96] opacity-0 blur-[2px]",
-            )}
-          >
-            <p className="text-[var(--panel-muted)] text-[11px] font-semibold uppercase tracking-[0.18em]">
-              Sayfalar
-            </p>
-            <div className="mt-5 grid gap-6 sm:grid-cols-2">
-              {NAV_GROUPS.map((group) => (
-                <div key={group.title}>
-                  <div className="text-[var(--panel-muted)] mb-3 flex items-center gap-2">
-                    <group.icon className="size-4 opacity-80" aria-hidden />
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em]">{group.title}</span>
-                  </div>
-                  <ul className="flex flex-col gap-1">
-                    {group.links.map((link) => {
-                      const active =
-                        link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
-                      const emphasized = link.href === "/analiz";
-                      return (
-                        <li key={link.href}>
-                          <Link
-                            href={link.href}
-                            className={cn(
-                              "focus-visible:ring-ring block rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
-                              emphasized
-                                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                : active
-                                  ? "bg-[var(--panel-active-bg)] text-[var(--panel-active-fg)]"
-                                  : "text-[var(--panel-link)] hover:bg-[var(--panel-row-hover)]",
-                            )}
-                            onClick={() => setMenuOpen(false)}
-                          >
-                            {link.label}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
             </div>
-            <p className="text-[var(--panel-muted)] border-border/60 mt-5 border-t pt-4 text-xs leading-relaxed">
-              Menüyü kapatmak için dışarı tıklayın veya Esc tuşuna basın.
-            </p>
-          </div>
+            <div className="flex flex-col items-start leading-tight">
+              <span
+                className={cn(
+                  "font-sans text-lg font-bold tracking-tight transition-colors duration-300",
+                  menuOpen ? "text-primary" : "text-white"
+                )}
+              >
+                FinanceScout
+              </span>
+              <span
+                className={cn(
+                  "text-[11px] font-medium transition-colors duration-300",
+                  menuOpen ? "text-muted-foreground" : "text-white/70"
+                )}
+              >
+                Menüyü {menuOpen ? "Kapat" : "Aç"}
+              </span>
+            </div>
+          </button>
         </div>
 
-        {/* Sağ: ana aksiyon */}
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex items-center gap-4">
           <Link
             href="/analiz"
             className={cn(
-              buttonVariants({ size: "default" }),
-              "rounded-xl px-5 py-2.5 text-[13px] font-semibold shadow-md md:text-sm",
+              buttonVariants({ variant: "brand", size: "sm" }),
+              "hidden px-6 sm:flex"
             )}
           >
-            Analiz
+            Hızlı Analiz
           </Link>
         </div>
+      </header>
+
+      {/* Sol Kenar Menü (Sidebar) - En Alta Kadar İlerleyen Yapı */}
+      <div
+        ref={shellRef}
+        className={cn(
+          "bg-background/95 border-border fixed inset-y-0 left-0 z-[120] w-72 border-r shadow-2xl backdrop-blur-xl transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] md:w-80",
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex h-full flex-col pt-24">
+          <nav className="flex-1 overflow-y-auto px-4 pb-10">
+            {NAV_GROUPS.map((group, groupIdx) => (
+              <div key={group.title} className={cn(groupIdx > 0 ? "mt-8" : "")}>
+                <div className="mb-4 px-3">
+                  <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-[0.2em]">
+                    {group.title}
+                  </span>
+                </div>
+                <ul className="space-y-1">
+                  {group.links.map((link) => {
+                    const active =
+                      link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
+                    return (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className={cn(
+                            "flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-all",
+                            active
+                              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                              : "text-foreground hover:bg-muted hover:pl-5"
+                          )}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </nav>
+          
+          <div className="border-border/50 bg-muted/30 border-t p-6">
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              © 2026 FinanceScout <br />
+              Dijital Finans Analiz Platformu
+            </p>
+          </div>
+        </div>
       </div>
-    </header>
+
+      {/* Karartma Örtüsü (Overlay) - Blur kaldırıldı, şeffaf yapıldı */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-[110] bg-transparent transition-opacity duration-500"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+    </>
   );
 }
+
+

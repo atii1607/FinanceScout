@@ -7,7 +7,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from data_service import fetch_history, fetch_history_range
+from data_service import fetch_history, fetch_history_range, fetch_market_summary
 from model_profiles import get_profile, resolve_asset_class
 from prophet_service import backtest_split, cutoff_train_forecast, fit_and_forecast
 from schemas import (
@@ -16,6 +16,8 @@ from schemas import (
     ForecastRequest,
     ForecastResponse,
     HealthResponse,
+    MarketItem,
+    MarketSummaryResponse,
     Metrics,
     SeriesPoint,
 )
@@ -102,6 +104,13 @@ def _row_to_point_forecast(row: pd.Series) -> SeriesPoint:
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(status="ok")
+
+
+@app.get("/market-summary", response_model=MarketSummaryResponse)
+def market_summary() -> MarketSummaryResponse:
+    symbols = ["BTC-USD", "USDTRY=X", "GC=F", "^GSPC", "THYAO.IS"]
+    items = fetch_market_summary(symbols)
+    return MarketSummaryResponse(items=[MarketItem(**item) for item in items])
 
 
 STATIC_SYMBOL_SUGGESTIONS = [

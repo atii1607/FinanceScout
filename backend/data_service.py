@@ -87,6 +87,53 @@ def fetch_history_range(symbol: str, start: str, end: str | None = None) -> pd.D
     return out[["ds", "y"]]
 
 
+def fetch_market_summary(symbols: list[str]) -> list[dict]:
+    """Birden fazla sembol için son fiyat ve günlük değişim bilgilerini topluca çeker."""
+    results = []
+    try:
+        # download ile tüm sembolleri tek seferde çekmek daha hızlıdır.
+        df = yf.download(symbols, period="5d", interval="1d", progress=False, group_by='ticker')
+        
+        for sym in symbols:
+            try:
+                # Group by ticker yapınca MultiIndex döner: (Symbol, Column)
+                if len(symbols) > 1:
+                    ticker_df = df[sym]
+                else:
+                    ticker_df = df
+                    
+                ticker_df = ticker_df.dropna(subset=["Close"])
+                if ticker_df.empty or len(ticker_df) < 2:
+                    continue
+                
+                last_two = ticker_df["Close"].tail(2)
+                current_price = float(last_two.iloc[-1])
+                prev_price = float(last_two.iloc[-2])
+                change_pct = ((current_price - prev_price) / prev_price) * 100
+                
+                # İsim bilgisi için ayrı bir eşleme kullanabiliriz veya sembolü isim olarak bırakabiliriz.
+                # ticker.info çok yavaş olduğu için burada kullanmamak daha iyi.
+                friendly_names = {
+                    "BTC-USD": "Bitcoin",
+                    "USDTRY=X": "Dolar / TL",
+                    "GC=F": "Altın (Ons)",
+                    "^GSPC": "S&P 500",
+                    "THYAO.IS": "Türk Hava Yolları"
+                }
+                
+                results.append({
+                    "symbol": sym,
+                    "price": current_price,
+                    "change_pct": change_pct,
+                    "name": friendly_names.get(sym, sym)
+                })
+            except Exception:
+                continue
+    except Exception:
+        pass
+        
+    return results
+
 def daily_returns_volatility(prices: pd.Series, annualization: int = 252) -> tuple[float, float]:
     """Log-return daily std and annualized std."""
     r = np.log(prices / prices.shift(1)).dropna()
@@ -95,3 +142,4 @@ def daily_returns_volatility(prices: pd.Series, annualization: int = 252) -> tup
     daily = float(r.std(ddof=1))
     annual = daily * (annualization**0.5)
     return daily, annual
+

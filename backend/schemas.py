@@ -75,5 +75,16 @@ class BacktestResponse(BaseModel):
     test_predicted: list[SeriesPoint]
 
 
+class MarketItem(BaseModel):
+    symbol: str
+    name: str
+    price: float
+    change_pct: float
+
+
+class MarketSummaryResponse(BaseModel):
+    items: list[MarketItem]
+
+
 class HealthResponse(BaseModel):
     status: str

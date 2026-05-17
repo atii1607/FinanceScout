@@ -1,20 +1,23 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Landmark, LineChart, Lock, ShieldCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, Landmark, LineChart, Lock, ShieldCheck, Sparkles, MousePointer2, BarChart3, Binary } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MarketSummary } from "@/components/site/market-summary";
 
 /** Ana sayfa: degrade zeminin koyu tarafında okunabilirlik için açık tipografi */
 export default function HomePage() {
   return (
     <div className="overflow-hidden pb-24 text-white">
+      {/* Hero Section */}
       <section className="relative mx-auto max-w-7xl px-5 pt-10 md:px-8 md:pt-14">
         <div className="pointer-events-none absolute inset-x-5 top-3 hidden h-px bg-white/18 lg:block" />
         <div className="pointer-events-none absolute bottom-0 right-8 top-0 hidden w-px bg-white/14 xl:block" />
 
         <div className="grid min-h-[520px] items-center gap-12 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.72fr)] xl:gap-16">
           <div className="relative border-l-[4px] border-white/45 pl-6 md:pl-9">
-            <p className="text-[13px] font-bold uppercase tracking-[0.2em] text-sky-100 drop-shadow-sm">
+            <p className="text-[13px] font-bold uppercase tracking-[0.2em] text-sky-100 drop-shadow-sm flex items-center gap-2">
+              <Sparkles className="size-4" />
               Kurumsal finansal görünürlük
             </p>
             <h1 className="font-heading mt-5 max-w-[760px] text-5xl font-semibold leading-[1.02] tracking-[-0.035em] text-white drop-shadow-[0_3px_18px_rgba(0,0,0,0.35)] md:text-6xl lg:text-[4.75rem]">
@@ -27,7 +30,7 @@ export default function HomePage() {
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link
                 href="/analiz"
-                className={cn(buttonVariants({ size: "lg" }), "h-12 px-6 text-[15px] shadow-xl shadow-black/30")}
+                className={cn(buttonVariants({ variant: "brand", size: "lg" }), "h-12 px-7")}
               >
                 Analiz merkezine git
                 <ArrowRight className="size-4" aria-hidden />
@@ -35,8 +38,8 @@ export default function HomePage() {
               <Link
                 href="/guvenlik"
                 className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-12 border-white/55 bg-white/8 px-6 text-[15px] font-semibold text-white shadow-lg shadow-black/10 hover:bg-white/16 hover:text-white",
+                  buttonVariants({ variant: "glass", size: "lg" }),
+                  "h-12 px-7",
                 )}
               >
                 Güven yaklaşımımız
@@ -93,7 +96,69 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto mt-14 max-w-7xl px-5 md:px-8">
+      {/* Market Summary Section */}
+      <section className="mx-auto mt-20 max-w-7xl px-5 md:px-8">
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-100">Canlı Piyasalar</p>
+            <h2 className="font-heading mt-3 text-3xl font-semibold tracking-[-0.02em] text-white md:text-4xl">
+              Piyasa Özeti
+            </h2>
+          </div>
+          <p className="max-w-md text-sm font-medium text-white/60">
+            En popüler varlıkların son fiyatları ve günlük değişimleri. Veriler Yahoo Finance üzerinden anlık çekilmektedir.
+          </p>
+        </div>
+        <MarketSummary />
+      </section>
+
+      {/* How it Works Section */}
+      <section className="mx-auto mt-24 max-w-7xl px-5 md:px-8">
+        <div className="rounded-3xl border border-white/12 bg-white/5 p-8 md:p-14">
+          <div className="text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-100">Metodoloji</p>
+            <h2 className="font-heading mt-4 text-4xl font-semibold tracking-[-0.02em] text-white md:text-5xl">
+              Nasıl Çalışır?
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-white/70">
+              Karmaşık finansal modelleri sadeleştirerek, veriye dayalı öngörüler sunuyoruz.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-10 md:grid-cols-3">
+            {[
+              {
+                icon: MousePointer2,
+                title: "Varlığını Seç",
+                desc: "100.000'den fazla hisse senedi, kripto para ve döviz çifti arasından analiz etmek istediğini seç.",
+              },
+              {
+                icon: Binary,
+                title: "Modeli Yapılandır",
+                desc: "Geçmiş veri aralığını ve tahmin ufkunu belirle. AI modellerimiz veriyi senin için işlesin.",
+              },
+              {
+                icon: BarChart3,
+                title: "Sonuçları Yorumla",
+                desc: "RMSE ve MAE gibi doğruluk metrikleriyle birlikte tahmin grafiğini incele, riskini yönet.",
+              },
+            ].map(({ icon: Icon, title, desc }, i) => (
+              <div key={title} className="relative flex flex-col items-center text-center">
+                {i < 2 && (
+                  <div className="absolute right-[-20%] top-1/4 hidden h-px w-[40%] bg-gradient-to-r from-white/20 to-transparent md:block" />
+                )}
+                <div className="flex size-16 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/20">
+                  <Icon className="size-8" />
+                </div>
+                <h3 className="mt-8 text-xl font-bold text-white">{title}</h3>
+                <p className="mt-4 text-[15px] leading-relaxed text-white/60">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto mt-24 max-w-7xl px-5 md:px-8">
         <div className="grid gap-8 border-y border-white/22 py-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-100">Banka sitesi disiplini</p>
@@ -182,7 +247,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/analiz"
-            className={cn(buttonVariants({ size: "lg" }), "h-12 w-full shrink-0 px-7 shadow-xl shadow-black/25 md:w-auto")}
+            className={cn(buttonVariants({ variant: "brand", size: "lg" }), "h-12 w-full shrink-0 px-8 md:w-auto")}
           >
             Analizi aç
             <ArrowRight className="size-4" aria-hidden />
@@ -192,3 +257,4 @@ export default function HomePage() {
     </div>
   );
 }
+
