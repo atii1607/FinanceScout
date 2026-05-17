@@ -82,9 +82,6 @@ export function SiteNavbar() {
           >
             <div className="relative">
               <LogoMark className="size-11 rounded-xl shadow-lg transition-transform group-hover:scale-105 sm:size-12" />
-              {menuOpen && (
-                <div className="bg-primary absolute -right-1 -top-1 size-3 rounded-full border-2 border-white" />
-              )}
             </div>
             <div className="flex flex-col items-start leading-tight">
               <span

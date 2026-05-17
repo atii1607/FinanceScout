@@ -10,10 +10,10 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("mx-auto w-full max-w-6xl px-4 pt-10 pb-8 md:pt-14 md:pb-10", className)}>
-      <h1 className="font-heading text-heading text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
+    <header className={cn("mx-auto w-full max-w-7xl px-6 pt-10 pb-8 md:pt-14 md:pb-10", className)}>
+      <h1 className="font-heading text-white text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
       {description ? (
-        <p className="text-muted-foreground mt-4 max-w-3xl text-[15px] leading-relaxed md:text-base">{description}</p>
+        <p className="text-sky-100/70 mt-5 max-w-4xl text-lg font-medium leading-relaxed">{description}</p>
       ) : null}
     </header>
   );

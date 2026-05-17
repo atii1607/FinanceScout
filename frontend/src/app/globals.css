@@ -232,4 +232,15 @@
     opacity: 1;
     transition: all 0.5s;
   }
+
+  /* Sayı girişlerindeki yukarı-aşağı oklarını kaldır */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 }

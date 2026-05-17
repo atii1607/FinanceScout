@@ -20,23 +20,29 @@ class ProphetModelProfile:
 
 
 def _profiles() -> dict[AssetClass, ProphetModelProfile]:
+    # Tüm sınıflarda additive seasonality + ham (log değil) fiyat. Bu kombo
+    # uzun ufukta lineer extrapolasyon verir; multiplicative compounding ya
+    # da log → exp() exponansiyel patlaması yok. Anchor + trend dampening
+    # ile birlikte tutarlı sonuç üretir.
     return {
         "stock": ProphetModelProfile(
             asset_class="stock",
-            changepoint_prior_scale=0.05,
+            changepoint_prior_scale=0.025,
             seasonality_mode="additive",
             volatility_annualization=252,
         ),
         "fx": ProphetModelProfile(
             asset_class="fx",
-            changepoint_prior_scale=0.05,
+            # FX trendi genelde düzenli ama uzun ufukta agresifleşmemeli.
+            changepoint_prior_scale=0.03,
             seasonality_mode="additive",
             volatility_annualization=252,
         ),
         "crypto": ProphetModelProfile(
             asset_class="crypto",
-            changepoint_prior_scale=0.09,
-            seasonality_mode="multiplicative",
+            # Kripto biraz daha esnek olabilir.
+            changepoint_prior_scale=0.05,
+            seasonality_mode="additive",
             volatility_annualization=365,
         ),
     }

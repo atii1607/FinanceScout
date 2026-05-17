@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { PriceChart, type ChartRow } from "@/components/price-chart";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import type { AssetClassParam, BacktestApiResponse, ForecastApiResponse, Metrics } from "@/lib/api";
 import { fetchSymbols, postBacktest, postForecast } from "@/lib/api";
 import {
@@ -73,24 +74,24 @@ function fmtPct(n: number | null | undefined) {
 
 function riskFromVol(annual?: number | null) {
   if (annual === null || annual === undefined || Number.isNaN(annual)) {
-    return { label: "Belirsiz", className: "bg-muted text-muted-foreground" };
+    return { label: "Belirsiz", className: "bg-white/10 text-white/60" };
   }
   if (annual < 0.15)
     return {
-      label: "Daha sakin",
+      label: "Düşük Risk (Sakin)",
       className:
-        "bg-blue-950/25 text-blue-950 dark:bg-blue-950/45 dark:text-blue-100",
+        "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
     };
   if (annual < 0.35)
     return {
-      label: "Orta",
+      label: "Orta Risk",
       className:
-        "bg-amber-950/22 text-amber-950 dark:bg-amber-950/40 dark:text-amber-50",
+        "bg-amber-500/20 text-amber-400 border border-amber-500/30",
     };
   return {
-    label: "Daha hareketli",
+    label: "Yüksek Risk",
     className:
-      "bg-rose-950/22 text-rose-950 dark:bg-rose-950/42 dark:text-rose-50",
+      "bg-rose-500/20 text-rose-400 border border-rose-500/30",
   };
 }
 
@@ -112,9 +113,9 @@ function MetricTile({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-heading text-sm font-semibold">{title}</p>
-      <p className="text-muted-foreground text-xs leading-relaxed">{hint}</p>
-      <div className="text-heading pt-1 text-xl font-semibold tabular-nums tracking-tight">{value}</div>
+      <p className="text-white text-sm font-semibold">{title}</p>
+      <p className="text-sky-200/60 text-xs leading-relaxed">{hint}</p>
+      <div className="text-white pt-1 text-xl font-semibold tabular-nums tracking-tight">{value}</div>
     </div>
   );
 }
@@ -137,11 +138,11 @@ function MetricsSection({
 
   return (
     <section className="flex flex-col gap-5">
-      <h2 className="font-heading text-heading text-xl font-semibold tracking-tight">{title}</h2>
+      <h2 className="font-heading text-white text-xl font-semibold tracking-tight">{title}</h2>
       {trainUntil ? (
-        <p className="border-primary/35 bg-muted/25 text-muted-foreground border-l-[3px] px-4 py-3 text-sm leading-relaxed">
-          <strong className="text-heading">Kesit modu:</strong> Model veriyi yalnızca{" "}
-          <strong className="text-heading">{trainUntil}</strong> tarihine kadar «gördü». Bu tarihten sonraki gerçek fiyatlar,
+        <p className="border-primary/35 bg-sky-500/10 text-sky-100 border-l-[3px] px-4 py-3 text-sm leading-relaxed">
+          <strong className="text-white">Kesit modu:</strong> Model veriyi yalnızca{" "}
+          <strong className="text-white">{trainUntil}</strong> tarihine kadar «gördü». Bu tarihten sonraki gerçek fiyatlar,
           modele kapalı kalarak karşılaştırmada kullanıldı — böylece «bilmediği dönem» hatasını ölçebilirsiniz.
         </p>
       ) : null}
@@ -171,8 +172,8 @@ function MetricsSection({
           }
         />
         <div className="flex flex-col gap-2 py-1">
-          <p className="text-heading text-sm font-semibold">Risk özeti</p>
-          <p className="text-muted-foreground text-xs leading-relaxed">
+          <p className="text-white text-sm font-semibold">Risk özeti</p>
+          <p className="text-sky-200/40 text-xs leading-relaxed">
             Yıllıklaştırılmış oynaklığa göre kabaca bir etiket; yatırım tavsiyesi değildir.
           </p>
           <span className={`mt-1 inline-flex w-fit rounded-md px-2.5 py-1 text-sm font-medium ${risk.className}`}>
@@ -181,9 +182,9 @@ function MetricsSection({
         </div>
       </div>
       {biasFinite ? (
-        <p className="text-muted-foreground text-sm leading-relaxed">
-          <strong className="text-heading">Ortalama sapma (bias):</strong> tahminler gerçek fiyatın ortalama olarak{" "}
-          <strong className="text-heading">{fmtNum(m.mean_bias)}</strong> kadar{" "}
+        <p className="text-sky-200/60 text-sm leading-relaxed">
+          <strong className="text-white">Ortalama sapma (bias):</strong> tahminler gerçek fiyatın ortalama olarak{" "}
+          <strong className="text-white">{fmtNum(m.mean_bias)}</strong> kadar{" "}
           {(m.mean_bias as number) > 0 ? "üzerinde" : "altında"} kalmış. İleri tahminlerde düzeltme çarpanı düşünmek
           isterseniz bu işareti referans alabilirsiniz (otomatik uygulanmaz).
         </p>
@@ -247,6 +248,14 @@ export function Dashboard() {
     setError(null);
     setForecast(null);
     setBacktest(null);
+    
+    // Değerleri limitlere göre sınırla (Clamping)
+    const finalHistory = Math.min(Math.max(historyDays, 60), 3650);
+    const finalForecast = Math.min(Math.max(forecastDays, 1), 90);
+    
+    setHistoryDays(finalHistory);
+    setForecastDays(finalForecast);
+
     setLoading(true);
     try {
       const sym = symbol.trim().toUpperCase();
@@ -254,8 +263,8 @@ export function Dashboard() {
 
       const fc = await postForecast({
         symbol: sym,
-        history_days: historyDays,
-        forecast_days: forecastDays,
+        history_days: finalHistory,
+        forecast_days: finalForecast,
         asset_class: assetClass,
         ...(useTrainCutoff && trainUntil.trim()
           ? { train_until: trainUntil.trim(), data_start: dataStart.trim() || undefined }
@@ -310,347 +319,250 @@ export function Dashboard() {
   const showEmptyHint = !forecast && !loading;
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-16 pt-0 md:pb-20">
-      <section className="flex flex-col gap-8">
-        <header className="space-y-2">
-          <h2 className="font-heading text-heading text-2xl font-semibold tracking-tight">Analiz ayarları</h2>
-          <p className="text-muted-foreground max-w-3xl text-[15px] leading-relaxed">
-            Aşağıdaki listede yaygın dövizler, kripto paralar, BIST ve örnek hisseler yer alır; tek tıkla Yahoo Finance
-            kodu ve model profili ayarlanır. Liste dışı bir sembol için alttaki gelişmiş seçeneği açın.
-          </p>
-        </header>
-        <div className="flex flex-col gap-6">
-          <div className="rounded-xl border border-border/50 bg-muted/20 p-4 md:p-5">
-            <div className="flex flex-col gap-1">
-              <p className="text-heading text-sm font-medium">Varlık seç</p>
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                Sol sütunda kategori, sağda arama ve liste. Bir satıra tıklayınca hem kod hem model profili güncellenir.
-              </p>
-            </div>
-            <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:gap-5">
-              <div className="flex flex-col gap-2">
-                <Label className="text-xs font-medium text-muted-foreground">Kategori</Label>
-                <div className="flex max-h-56 flex-col gap-1.5 overflow-y-auto pr-1">
-                  {INSTRUMENT_CATEGORY_META.map((c) => (
-                    <Button
-                      key={c.id}
-                      type="button"
-                      variant={pickerCategory === c.id ? "secondary" : "outline"}
-                      size="sm"
-                      className="h-auto min-h-10 shrink-0 justify-start whitespace-normal px-3 py-2 text-left"
-                      onClick={() => setPickerCategory(c.id)}
-                    >
-                      <span className="flex flex-col gap-0.5">
-                        <span className="font-medium">{c.title}</span>
-                        <span className="text-muted-foreground text-xs font-normal leading-snug">{c.blurb}</span>
-                      </span>
-                    </Button>
-                  ))}
-                </div>
+    <div className="mx-auto grid w-full max-w-7xl items-start gap-8 px-6 pb-20 pt-0 lg:grid-cols-[380px_1fr]">
+      {/* Sol Panel: Ayarlar */}
+      <aside className="lg:sticky lg:top-28 space-y-6">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl">
+          <h2 className="font-heading mb-6 flex items-center gap-2 text-xl font-bold text-white">
+            <BarChart3 className="size-5 text-primary" />
+            Analiz Ayarları
+          </h2>
+
+          <div className="space-y-6">
+            {/* Varlık Seçici */}
+            <div className="space-y-3">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-white/50">Varlık Seçimi</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {INSTRUMENT_CATEGORY_META.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setPickerCategory(c.id)}
+                    className={cn(
+                      "rounded-xl px-3 py-2 text-[11px] font-bold transition-all",
+                      pickerCategory === c.id 
+                        ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                        : "bg-white/5 text-white/60 hover:bg-white/10"
+                    )}
+                  >
+                    {c.title}
+                  </button>
+                ))}
               </div>
-              <div className="flex min-h-0 flex-col gap-2">
-                <Label htmlFor="picker_search" className="text-xs font-medium text-muted-foreground">
-                  Liste ve arama
-                </Label>
-                <Input
-                  id="picker_search"
+              
+              <div className="relative mt-4">
+                 <Input
                   value={pickerQuery}
                   onChange={(e) => setPickerQuery(e.target.value)}
-                  placeholder="İsim veya kod yazın (ör. dolar, THYAO)…"
-                  autoComplete="off"
-                  className="text-base"
+                  placeholder="Ara (ör. Dolar, BTC)..."
+                  className="h-10 border-white/10 bg-white/5 pl-4 pr-10 text-sm text-white placeholder:text-white/30 focus:ring-primary/30"
                 />
-                <div
-                  role="listbox"
-                  aria-label="Seçilebilir varlıklar"
-                  className="border-input bg-background max-h-56 overflow-y-auto rounded-lg border shadow-xs"
-                >
-                  {filteredPickerRows.length === 0 ? (
-                    <p className="text-muted-foreground p-4 text-sm leading-relaxed">Eşleşen sonuç yok.</p>
-                  ) : (
-                    filteredPickerRows.map((row) => {
-                      const active = symUpper === row.symbol;
-                      return (
-                        <button
-                          key={row.symbol}
-                          type="button"
-                          role="option"
-                          aria-selected={active}
-                          onClick={() => {
-                            setSymbol(row.symbol);
-                            setAssetClass(row.profile);
-                          }}
-                          className={`hover:bg-muted/80 flex w-full flex-col gap-0.5 border-b border-border/60 px-3 py-2.5 text-left text-sm transition-colors last:border-b-0 ${
-                            active ? "bg-primary/12" : ""
-                          }`}
-                        >
-                          <span className="text-heading font-medium leading-snug">{row.label}</span>
-                          <span className="text-muted-foreground font-mono text-xs tracking-tight">{row.symbol}</span>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
+              </div>
+
+              <div className="max-h-48 overflow-y-auto rounded-xl border border-white/10 bg-black/20 pr-1 custom-scrollbar">
+                {filteredPickerRows.map((row) => {
+                  const active = symUpper === row.symbol;
+                  return (
+                    <button
+                      key={row.symbol}
+                      onClick={() => {
+                        setSymbol(row.symbol);
+                        setAssetClass(row.profile);
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between px-4 py-3 text-left transition-colors",
+                        active ? "bg-primary/20 border-l-2 border-primary" : "hover:bg-white/5 border-l-2 border-transparent"
+                      )}
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-white">{row.label}</span>
+                        <span className="text-[10px] font-medium text-white/40">{row.symbol}</span>
+                      </div>
+                      {active && <div className="size-1.5 rounded-full bg-primary" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
-            <div className="border-border/60 mt-4 border-t pt-4">
-              <p className="text-sm leading-relaxed">
-                <span className="text-muted-foreground">Şu an seçili:</span>{" "}
-                <strong className="text-heading">{pickerSelectionLabel ?? "Özel / listede yok"}</strong>
-                {symUpper ? (
-                  <>
-                    {" "}
-                    <code className="bg-muted rounded px-1.5 py-0.5 text-xs">{symUpper}</code>
-                  </>
-                ) : null}
-              </p>
-            </div>
-          </div>
 
-          <details className="group rounded-xl border border-border/50 bg-muted/15 px-4 py-3 open:bg-muted/25">
-            <summary className="cursor-pointer list-none text-sm font-medium leading-relaxed outline-none marker:hidden [&::-webkit-details-marker]:hidden">
-              <span className="text-heading underline-offset-2 group-open:underline">
-                İleri: Kendi Yahoo Finance sembolümü yazarım
-              </span>
-              <span className="text-muted-foreground font-normal">
-                {" "}
-                — Liste dışı hisse veya döviz kodu (ör. <code className="rounded bg-muted px-1 py-0.5 text-xs">USDTRY=X</code>
-                ).
-              </span>
-            </summary>
-            <div className="mt-4 flex flex-col gap-2 pb-1">
-              <Label htmlFor="symbol">Sembol</Label>
-              <Input
-                id="symbol"
-                value={symbol}
-                onChange={(e) => setSymbol(e.target.value)}
-                placeholder="Örn. BTC-USD, EURUSD=X, THYAO.IS"
-                autoComplete="off"
-                className="text-base font-mono"
-              />
-              {suggestions.length > 0 ? (
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  Sunucudan örnekler: {suggestions.slice(0, 8).join(" · ")}
-                </p>
-              ) : (
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  Kodu Yahoo Finance’te gördüğünüz «Ticker» ile birebir yazın.
-                </p>
-              )}
+            {/* Manuel Sembol */}
+            <div className="space-y-3">
+              <details className="group">
+                <summary className="flex cursor-pointer items-center justify-between text-[10px] font-bold uppercase tracking-widest text-white/50 outline-none">
+                   Özel Sembol Gir
+                   <span className="transition-transform group-open:rotate-180">↓</span>
+                </summary>
+                <div className="mt-4 pt-2">
+                  <Input
+                    value={symbol}
+                    onChange={(e) => setSymbol(e.target.value)}
+                    placeholder="BTC-USD, THYAO.IS..."
+                    className="h-10 border-white/10 bg-white/5 text-sm font-mono text-white"
+                  />
+                </div>
+              </details>
             </div>
-          </details>
 
-          <div className="rounded-xl border border-border/50 bg-muted/15 px-4 py-4">
-            <label className="flex cursor-pointer gap-3">
-              <input
-                type="checkbox"
-                className="border-input text-primary focus-visible:ring-ring mt-1 size-4 shrink-0 rounded border shadow-xs"
-                checked={useTrainCutoff}
-                onChange={(e) => setUseTrainCutoff(e.target.checked)}
-              />
-              <span className="text-sm leading-relaxed">
-                <span className="text-heading font-medium">Eğitimi belirli tarihte kes</span>
-                <span className="text-muted-foreground">
-                  {" "}
-                  — Model bu tarihe kadar olan günlük kapanışları görür; sonrasını tahmin eder ve indirdiğimiz gerçek
-                  fiyatlarla RMSE / MAE hesaplarız (ör. 2022 sonrasını bilerek karşılaştırma).
-                </span>
-              </span>
-            </label>
-            {useTrainCutoff ? (
-              <div className="mt-4 grid gap-4 border-t border-border/60 pt-4 md:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="train_until">Son eğitim günü (dahil)</Label>
-                  <Input
-                    id="train_until"
-                    type="date"
-                    value={trainUntil}
-                    onChange={(e) => setTrainUntil(e.target.value)}
-                    className="text-base"
-                  />
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    Öneri: uzun kıyas için hisselerde <code className="rounded bg-muted px-1">2022-12-31</code> gibi bir
-                    tarih deneyin; veri Yahoo’dan başlangıç tarihine kadar indirilir.
-                  </p>
+            {/* Parametreler */}
+            <div className="grid grid-cols-1 gap-4 border-t border-white/5 pt-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-white/50">Geçmiş Veri (Gün)</Label>
+                  <span className="text-[9px] font-medium text-white/30 italic">60 - 3650</span>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="data_start">Veri başlangıcı (isteğe bağlı)</Label>
-                  <Input
-                    id="data_start"
-                    type="date"
-                    value={dataStart}
-                    onChange={(e) => setDataStart(e.target.value)}
-                    className="text-base"
-                  />
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    Boş bırakılırsa sistem otomatik olarak yaklaşık 18 yıl geriye gider. İsterseniz daha kısa bir aralık
-                    seçerek indirmeyi hızlandırabilirsiniz.
-                  </p>
-                </div>
+                <Input
+                  type="number"
+                  value={historyDays}
+                  onChange={(e) => setHistoryDays(Number(e.target.value))}
+                  className="h-10 border-white/10 bg-white/5 text-white"
+                />
               </div>
-            ) : null}
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="asset" className="text-base">
-                Model profili
-              </Label>
-              <select
-                id="asset"
-                value={assetClass}
-                aria-label="Varlık türü veya otomatik profil"
-                onChange={(e) => setAssetClass(e.target.value as AssetClassParam)}
-                className="border-input bg-background dark:bg-input/30 h-10 w-full rounded-lg border px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-              >
-                <option value="auto">Otomatik (sembolden tahmin et)</option>
-                <option value="crypto">Kripto için ayarla</option>
-                <option value="fx">Döviz için ayarla</option>
-                <option value="stock">Hisse için ayarla</option>
-              </select>
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                Listeden seçince uygun profil atanır; özel sembollerde «Otomatik» veya elle seçim kullanın.
-              </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-white/50">Tahmin Ufku (Gün)</Label>
+                  <span className="text-[9px] font-medium text-white/30 italic">1 - 90</span>
+                </div>
+                <Input
+                  type="number"
+                  value={forecastDays}
+                  onChange={(e) => setForecastDays(Number(e.target.value))}
+                  className="h-10 border-white/10 bg-white/5 text-white"
+                />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="hist" className="text-base">
-                Kaç günlük geçmiş?
-              </Label>
-              <Input
-                id="hist"
-                type="number"
-                min={60}
-                max={3650}
-                value={historyDays}
-                disabled={useTrainCutoff}
-                onChange={(e) => setHistoryDays(Number(e.target.value))}
-                className="text-base"
-              />
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                {useTrainCutoff
-                  ? "Kesit modunda «Kaç günlük geçmiş» kullanılmaz; bunun yerine veri başlangıcı ve kesit tarihi kullanılır."
-                  : "Model ne kadar uzun geçmiş görürse o kadar bağlam alır; çok kısa seçmeyin (en az 60 önerilir)."}
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="fh" className="text-base">
-                Kaç gün ilerisini tahmin et?
-              </Label>
-              <Input
-                id="fh"
-                type="number"
-                min={1}
-                max={90}
-                value={forecastDays}
-                onChange={(e) => setForecastDays(Number(e.target.value))}
-                className="text-base"
-              />
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                Varsayılan 9 gündür. Uzun ufuklar belirsizliği artırır; demo için kısa tutmak daha sağlıklıdır.
-              </p>
-            </div>
-          </div>
-
-          {error ? (
-            <div
-              role="alert"
-              className="rounded-xl border border-destructive/35 bg-destructive/8 px-4 py-3 text-sm leading-relaxed text-destructive"
+            <Button 
+              onClick={run} 
+              disabled={loading}
+              className={cn(buttonVariants({ variant: "brand", size: "lg" }), "w-full shadow-2xl shadow-primary/20")}
             >
-              {error}
+              {loading ? "Hesaplanıyor..." : "Analizi Başlat"}
+            </Button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-medium text-rose-300">
+            {error}
+          </div>
+        )}
+      </aside>
+
+      {/* Sağ Panel: Grafikler ve Sonuçlar */}
+      <main className="min-h-[600px] space-y-8">
+        {showEmptyHint && (
+          <div className="flex h-full min-h-[600px] flex-col items-center justify-center rounded-[40px] border border-dashed border-white/10 bg-white/5 p-20 text-center">
+            <div className="flex size-20 items-center justify-center rounded-3xl bg-white/5 text-white/20 mb-8">
+               <LineChart className="size-10" />
             </div>
-          ) : null}
-        </div>
-        <div className="flex flex-col gap-3 border-t border-border/50 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-muted-foreground order-2 text-xs leading-relaxed sm:order-1">
-            Arka uç adresi: <code className="rounded bg-muted px-1 py-0.5">{process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}</code>
-          </p>
-          <Button type="button" size="lg" className="order-1 w-full sm:order-2 sm:w-auto" disabled={loading} onClick={run}>
-            {loading ? "Hesaplanıyor…" : "Tahmini göster"}
-          </Button>
-        </div>
-      </section>
+            <h3 className="font-heading text-2xl font-bold text-white">Analize Hazır</h3>
+            <p className="mt-4 max-w-md text-lg font-medium text-white/40">
+              Sol taraftan bir varlık seçip ayarlarınızı yapılandırdıktan sonra "Analizi Başlat" butonuna tıklayarak sonuçları görebilirsiniz.
+            </p>
+          </div>
+        )}
 
-      {showEmptyHint ? (
-        <div className="border-border/45 py-14 text-center">
-          <p className="text-muted-foreground mx-auto max-w-md text-[15px] leading-relaxed">
-            Henüz sonuç yok. Yukarıdan listeden bir varlık seçip (veya gelişmiş seçenekten sembol yazıp){" "}
-            <strong className="text-heading font-medium">Tahmini göster</strong>
-            dediğinizde burada grafik ve özet metrikler belirir.
-          </p>
-        </div>
-      ) : null}
+        {loading && (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-3xl bg-white/5 border border-white/10" />
+              ))}
+            </div>
+            <Skeleton className="h-[500px] rounded-[40px] bg-white/5 border border-white/10" />
+          </div>
+        )}
 
-      {loading ? (
-        <div className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm">Veri indiriliyor ve model çalışıyor; genelde birkaç saniye sürer.</p>
-          <Skeleton className="h-11 w-full max-w-lg rounded-lg" />
-          <Skeleton className="h-[380px] w-full rounded-xl" />
-        </div>
-      ) : null}
+        {forecast && !loading && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
+            {/* Metrik Kartları */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+               {[
+                 { label: "Hata Payı (RMSE)", value: fmtNum(forecast.backtest_metrics.rmse), icon: Zap },
+                 { label: "Günlük Oynaklık", value: fmtPct(forecast.backtest_metrics.volatility_daily), icon: TrendingUp },
+                 { label: "Yıllık Tahmini", value: fmtPct(forecast.backtest_metrics.volatility_annualized), icon: Globe },
+                 { label: "Risk Skoru", value: riskFromVol(forecast.backtest_metrics.volatility_annualized).label, badge: true, icon: ShieldCheck }
+               ].map((m) => (
+                 <div key={m.label} className="group rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all hover:bg-white/10">
+                    <div className="flex items-center justify-between mb-3">
+                       <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">{m.label}</p>
+                       <m.icon className="size-4 text-primary opacity-40 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                       {!m.badge && <span className="text-2xl font-bold text-white tabular-nums">{m.value}</span>}
+                    </div>
+                    {m.badge && (
+                      <span className={cn(
+                        "mt-1 inline-block rounded-full px-4 py-1.5 text-[11px] font-bold uppercase",
+                        riskFromVol(forecast.backtest_metrics.volatility_annualized).className
+                      )}>
+                        {m.value}
+                      </span>
+                    )}
+                 </div>
+               ))}
+            </div>
 
-      {forecast && !loading ? (
-        <>
-          <MetricsSection
-            title="Özet metrikler (bilgi amaçlı)"
-            m={forecast.backtest_metrics}
-            trainUntil={forecast.train_until_used}
-          />
-
-          <Tabs defaultValue="forecast" className="gap-6">
-            <TabsList variant="line" className="w-full justify-start overflow-x-auto">
-              <TabsTrigger value="forecast">Tahmin grafiği</TabsTrigger>
-              <TabsTrigger value="backtest">Geçmişe dönük test</TabsTrigger>
-            </TabsList>
-            <TabsContent value="forecast" className="mt-0 outline-none">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-heading text-heading text-xl font-semibold">{forecast.symbol}</h3>
-                  <p className="text-muted-foreground mt-3 text-[15px] leading-relaxed">
-                    Kullanılan profil: <strong className="text-heading">{assetLabelTr(forecast.asset_class)}</strong>
-                    {forecast.train_until_used ? (
-                      <>
-                        . <strong className="text-heading">Kesit tarihi:</strong> {forecast.train_until_used} — model bu
-                        tarihten sonraki gerçek kapanışları eğitimde kullanmadı; grafikte hem gerçek hem tahmin birlikte
-                        görünür.
-                      </>
-                    ) : null}{" "}
-                    Ana renkli çizgi gerçek kapanışları gösterir; daha açık ton modelin geçmiş uyumunu; vurgulu ton ileri
-                    tahmini temsil eder (kesit kullanıldıysa gerçek çizgi sonrasında da görünür). Kesik çizgiler kabaca üst/
-                    alt bandı işaret eder.
-                  </p>
-                </div>
-                <div className="border-border/45 border-t pt-8">
-                  <PriceChart data={forecastChart} />
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="backtest" className="mt-0 outline-none">
-              {backtest ? (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-heading text-heading text-xl font-semibold">Geçmişe dönük test</h3>
-                    <p className="text-muted-foreground mt-3 text-[15px] leading-relaxed">
-                      {forecast.train_until_used
-                        ? `Model ${forecast.train_until_used} tarihine kadar eğitildi; grafikte bu tarihten sonra gerçek fiyat ile model çıktısı yan yana. Üstteki RMSE/MAE bu «bilinmeyen dönem» için hesaplanır.`
-                        : `Verinin son %20'lik bölümünde modelin tahmini ile gerçek kapanış karşılaştırılır; üstteki RMSE ve MAE bu yöntemden gelir. Bu, geleceği garanti etmez.`}
-                    </p>
+            {/* Grafik Alanı */}
+            <div className="rounded-[40px] border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
+               <Tabs defaultValue="forecast">
+                  <div className="mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+                     <div>
+                        <div className="flex items-center gap-3">
+                           <h3 className="font-heading text-3xl font-bold text-white">{forecast.symbol} Analizi</h3>
+                           <div className="rounded-full bg-primary/20 px-3 py-1 text-[10px] font-bold text-primary uppercase tracking-tighter">
+                              {assetLabelTr(forecast.asset_class)}
+                           </div>
+                        </div>
+                        <p className="mt-2 text-sm font-medium text-white/50">
+                           Yapay zeka modellerimiz tarafından oluşturulan öngörü raporu.
+                        </p>
+                     </div>
+                     <TabsList className="bg-white/5 p-1 rounded-none border border-white/10">
+                        <TabsTrigger value="forecast" className="rounded-none px-6 py-2 text-xs font-bold text-white transition-all data-active:!bg-blue-500/20 data-active:!text-blue-400 hover:bg-blue-500/10 hover:!text-white">Tahmin</TabsTrigger>
+                        <TabsTrigger value="backtest" className="rounded-none px-6 py-2 text-xs font-bold text-white transition-all uppercase data-active:!bg-blue-500/20 data-active:!text-blue-400 hover:bg-blue-500/10 hover:!text-white">Geriye Dönük Test</TabsTrigger>
+                     </TabsList>
                   </div>
-                  <div className="border-border/45 border-t pt-8">
-                    <PriceChart data={backtestChart} />
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground border-border/45 border-t py-12 text-center text-[15px] leading-relaxed">
-                  Bu sekme için grafik yüklenemedi. «Kaç günlük geçmiş» değerini yükseltip yeniden deneyebilirsiniz.
-                </p>
-              )}
-            </TabsContent>
-          </Tabs>
-        </>
-      ) : null}
 
+                  <TabsContent value="forecast" className="mt-0 outline-none">
+                     <div className="h-[450px] w-full">
+                        <PriceChart data={forecastChart} />
+                     </div>
+                     <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-sky-500/10 p-5 border border-sky-500/20">
+                        <div className="flex items-center gap-3">
+                           <div className="size-2 rounded-full bg-white animate-pulse" />
+                           <p className="text-xs font-medium text-sky-200">
+                              <strong>Kılavuz:</strong> Beyaz çizgi gerçek verileri, renkli kalın çizgi AI tahminini simgeler.
+                           </p>
+                        </div>
+                        <span className="text-[10px] font-bold text-sky-300 uppercase tracking-widest">Canlı Veri Yayını</span>
+                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="backtest" className="mt-0 outline-none">
+                     <div className="h-[450px] w-full">
+                        {backtest ? (
+                           <PriceChart data={backtestChart} />
+                        ) : (
+                           <div className="flex h-full items-center justify-center text-white/20">Veri bulunamadı.</div>
+                        )}
+                     </div>
+                     <div className="mt-8 rounded-2xl bg-purple-500/10 p-6 border border-purple-500/20">
+                        <h4 className="text-purple-200 font-bold text-sm mb-2 uppercase tracking-wide">Bu Tarihler Neyi Gösteriyor?</h4>
+                        <p className="text-xs font-medium text-purple-200/80 leading-relaxed">
+                           Geriye Dönük Test, seçtiğiniz toplam geçmiş sürenin (örn. 500 gün) <strong>son %20&apos;lik dilimini</strong> kapsar. 
+                           Sistem, verinin ilk %80&apos;ini &quot;öğrenmek&quot; için kullanır; kalan son bölümü ise hiç görmemiş gibi davranarak tahmin eder. 
+                           Yukarıdaki grafikte gördüğünüz tarihler, modelin bu &quot;kör test&quot; sürecinde gerçek fiyatlara ne kadar yaklaştığını kanıtlayan <strong>doğrulama penceresidir.</strong>
+                        </p>
+                     </div>
+                  </TabsContent>
+               </Tabs>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
+
+// Helper icons and styles
+import { LineChart, TrendingUp, BarChart3, Zap, ShieldCheck, Globe } from "lucide-react";
