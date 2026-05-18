@@ -12,8 +12,7 @@ const FOOTER_COL = [
   {
     title: "Güvenlik ve yasal",
     links: [
-      { href: "/guvenlik", label: "Güvenlik" },
-      { href: "/yasal/gizlilik", label: "Gizlilik bildirimi" },
+      { href: "/yasal/gizlilik", label: "Gizlilik ve Güvenlik" },
       { href: "/yasal/kvkk", label: "KVKK aydınlatma" },
     ],
   },

@@ -9,54 +9,56 @@ export default function HakkimizdaPage() {
   return (
     <SimpleArticle
       title="Hakkımızda"
-      description="FinanceScout; karmaşık piyasa verilerini stratejik öngörülere dönüştüren, modern ve şeffaf bir finansal analiz ekosistemidir."
+      description="FinanceScout; karmaşık piyasa verilerini stratejik öngörülere dönüştüren, modern, dinamik ve şeffaf bir finansal analiz ekosistemidir."
     >
       <section>
         <p>
-          FinanceScout, finans dünyasının gürültüsünü azaltmak ve veri odaklı karar alma süreçlerini desteklemek amacıyla
-          geliştirilmiş bir dijital platformdur. Amacımız, sadece fiyat hareketlerini göstermek değil; bu hareketlerin
-          ardındaki trendleri ve olası gelecek senaryolarını bilimsel modellerle anlaşılır kılmaktır.
+          FinanceScout, finans dünyasının bilgi kirliliğini ve gürültüsünü minimize etmek, yatırımcıların 
+          veri odaklı karar alma süreçlerini desteklemek amacıyla geliştirilmiş ileri nesil bir dijital platformdur. 
+          Amacımız, sadece anlık fiyat hareketlerini listelemek değil; bu hareketlerin arkasında yatan makro ve mikro 
+          trendleri, döngüsel hareketleri ve olası gelecek senaryolarını bilimsel ve matematiksel modellerle herkes 
+          için anlaşılır kılmaktır.
         </p>
       </section>
 
       <section>
         <h2>Teknolojimiz ve Yaklaşımımız</h2>
         <p>
-          Platformumuzun kalbinde, Facebook tarafından geliştirilen <strong>Prophet</strong> zaman serisi tahmin
-          kütüphanesi yer almaktadır. Bu ileri seviye matematiksel modelleme sayesinde:
+          Platformumuzun analitik çekirdeğinde, zaman serisi tahminlemesinde küresel standartları belirleyen ve Meta 
+          (Facebook) tarafından açık kaynaklı olarak geliştirilen <strong>Prophet</strong> kütüphanesi 
+          yer almaktadır. Bu ileri seviye ekonometrik ve matematiksel modelleme altyapısı sayesinde piyasa verilerini şu bileşenlerle işliyoruz:
         </p>
         <ul>
           <li>
-            <strong>Trend Analizi:</strong> Fiyatlardaki uzun dönemli eğilimleri mevsimsellikten arındırarak net bir
-            şekilde sunuyoruz.
+            <strong>Gelişmiş Trend Analizi:</strong> Fiyat hareketlerindeki uzun vadeli eğilimleri; yıllık, haftalık ve günlük mevsimsellik etkilerinden tamamen arındırarak en saf haliyle sunuyoruz. Bu sayede piyasa tuzaklarını daha net analiz edebilirsiniz.
           </li>
           <li>
-            <strong>Gelecek Öngörüleri:</strong> Geçmiş verileri kullanarak belirli bir güven aralığında gelecek
-            tahminleri üretiyoruz.
+            <strong>Güven Aralıklı Gelecek Öngörüleri:</strong> Geçmiş fiyat hareketleri ve hacim verilerini derinlemesine inceleyerek, gelecek dönemlere ait tahminleri tek bir veri noktası yerine, matematiksel olasılıklara dayanan dinamik güven aralıkları (%95 olasılık bantları) ile üretiyoruz.
           </li>
           <li>
-            <strong>Hata Payı ve Volatilite:</strong> Tahminlerimizi RMSE ve MAE gibi metriklerle test ediyor, piyasa
-            oynaklığını matematiksel olarak ölçüyoruz.
+            <strong>Matematiksel Doğrulama ve Volatilite Takibi:</strong> Algoritmalarımızın ürettiği tahminlerin başarısını ve sapma paylarını RMSE (Kök Ortalama Kare Hata) ve MAE (Ortalama Mutlak Hata) gibi finansal istatistik metrikleriyle anlık olarak test ediyor, piyasa oynaklığını matematiksel olarak ölçüyoruz.
           </li>
         </ul>
       </section>
 
       <section>
-        <h2>Kapsamlı Veri Ağı</h2>
+        <h2>Kapsamlı Küresel Veri Ağı</h2>
         <p>
-          Borsa İstanbul&apos;dan (BIST) Wall Street&apos;e, kripto para piyasalarından emtia ve döviz paritelerine kadar
-          geniş bir yelpazede analiz imkanı sunuyoruz. Yahoo Finance API entegrasyonumuz ile küresel piyasaların nabzını
-          tutuyoruz.
+          Borsa İstanbul&apos;dan (BIST) Wall Street endekslerine, yüksek volatiliteye sahip kripto para piyasalarından 
+          küresel emtia ve döviz paritelerine (Forex) kadar oldukça geniş bir finansal spektrumda analiz imkanı tanıyoruz. 
+          Gelişmiş <strong>Yahoo Finance API</strong> entegrasyonumuz ve optimize edilmiş veri çekme 
+          mimarimiz sayesinde, küresel piyasaların nabzını milisaniyeler düzeyinde tutarak stratejilerinize hız kazandırıyoruz.
         </p>
       </section>
 
       <section>
         <h2>Kurucu Ekibimiz</h2>
         <p>
-          FinanceScout, teknoloji ve finansı bir araya getiren vizyoner bir ekip tarafından hayata geçirilmiştir.
-          Sorularınız veya iş birliği talepleriniz için bize ulaşabilirsiniz:
+          FinanceScout, teknoloji ve finansın kesişim kümesinde değer üretmeyi hedefleyen, analitik düşünce yapısına sahip 
+          vizyoner bir çekirdek ekip tarafından hayata geçirilmiştir. Sürdürülebilir finansal teknolojiler geliştirmek adına 
+          çalışmalarımızı küresel standartlarda sürdürüyoruz:
         </p>
-        <ul className="not-italic">
+        <ul>
           <li>
             <strong>Kurucu Ortak & Yazılım Geliştirici:</strong> Mehmet Emin Küçükkurt
           </li>
@@ -72,9 +74,9 @@ export default function HakkimizdaPage() {
       <section>
         <h2>Önemli Not</h2>
         <p>
-          FinanceScout bir demo ve öğrenme platformudur. Sunulan analizler, tahminler ve grafikler tamamen algoritmik
-          modellerin çıktılarıdır ve kesinlikle <strong>yatırım tavsiyesi niteliği taşımaz</strong>. Platformumuz
-          üzerinde gerçek bir bankacılık, portföy yönetimi veya aracılık hizmeti sunulmamaktadır.
+          FinanceScout bir demo, araştırma ve öğrenme platformudur. Sunulan analizler, tahminler ve grafikler 
+          tamamen algoritmik modellerin matematiksel çıktılarıdır ve kesinlikle <strong>yatırım tavsiyesi niteliği taşımaz</strong>. 
+          Platformumuz üzerinde gerçek bir bankacılık, portföy yönetimi, yatırım danışmanlığı veya aracılık hizmeti sunulmamaktadır.
         </p>
       </section>
     </SimpleArticle>

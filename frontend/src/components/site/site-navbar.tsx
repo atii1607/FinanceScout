@@ -16,7 +16,6 @@ const NAV_GROUPS = [
     links: [
       { href: "/home", label: "Ana sayfa" },
       { href: "/hizmetler", label: "Hizmetler" },
-      { href: "/guvenlik", label: "Güvenlik" },
       { href: "/analiz", label: "Analiz merkezi" },
     ],
   },
@@ -26,8 +25,8 @@ const NAV_GROUPS = [
     links: [
       { href: "/hakkimizda", label: "Hakkımızda" },
       { href: "/iletisim", label: "İletişim" },
-      { href: "/yardim", label: "Yardım merkezi" },
-      { href: "/yasal/gizlilik", label: "Gizlilik bildirimi" },
+      { href: "/yardim", label: "Yardım Merkezi" },
+      { href: "/yasal/gizlilik", label: "Gizlilik ve Güvenlik" },
       { href: "/yasal/kvkk", label: "KVKK aydınlatma" },
     ],
   },
